@@ -1,5 +1,6 @@
 const expect = require('chai').expect
 const request = require('request')
+//var chai = require('chai');
 
 
 describe('CREATE USER API', () => {
