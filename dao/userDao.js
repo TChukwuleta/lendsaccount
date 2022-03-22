@@ -1,7 +1,6 @@
 const db = require('../config/dbConfig')
 
 const createUser = async (firstName, lastName, email, password, accountNo, balance) => {
-    console.log(accountNo)
     const [ acctno ] = await db('user').insert({
         first_name: firstName,
         last_name: lastName,
@@ -9,7 +8,7 @@ const createUser = async (firstName, lastName, email, password, accountNo, balan
         password,
         account_no: accountNo,
         account_balance: balance
-    }).returning("account_no")
+    })
     return acctno
 }
 

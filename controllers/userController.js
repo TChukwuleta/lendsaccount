@@ -34,7 +34,6 @@ const createUser = async (req, res) => {
         if(findPerson[0]) return res.status(400).json({ message: "User with these details already exists" })
         const hashedPassword = await bcrypt.hash(password, 10)
         const newUserAccount = Math.floor(100000000 + Math.random() * 9000000000);
-        console.log(newUserAccount)
 
         const newUserDetails = {
             firstname, 
@@ -45,8 +44,7 @@ const createUser = async (req, res) => {
             balance: 0
         }
         const user = await userService.createUserService(newUserDetails)
-        console.log(user[0].account_no)
-        res.status(201).json({ message: `Your account has been created successfully. Your account number is ${user[0].account_no}` })
+        res.status(201).json({ message: `Your account has been created successfully. Your account number is ${newUserAccount}` })
     } catch (error) {
         console.log(error) 
         res.status(400).json({ message: error })
