@@ -45,8 +45,8 @@ const createUser = async (req, res) => {
             balance: 0
         }
         const user = await userService.createUserService(newUserDetails)
-        console.log(user)
-        res.status(201).json({ message: "User has been created successfully" })
+        console.log(user[0].account_no)
+        res.status(201).json({ message: `Your account has been created successfully. Your account number is ${user[0].account_no}` })
     } catch (error) {
         console.log(error) 
         res.status(400).json({ message: error })
@@ -67,7 +67,7 @@ const loginUser = async (req, res) => {
             firstname: findUser[0].first_name,
             email: findUser[0].email
         })
-        return res.status(201).json({ message: `Token is ${signature}` })
+        return res.status(201).json({ message: `${signature}` })
     } catch (error) {
         console.log(error)
         res.status(400).json({ message: error })

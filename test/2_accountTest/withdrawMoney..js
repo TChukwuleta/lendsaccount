@@ -1,43 +1,38 @@
-// const expect = require('chai').expect
-// const request = require('request')
+const expect = require('chai').expect
+const request = require('supertest')
+const appServer = require('../../app')
 
-// describe('WITHDRAW MONEY', () => {
-//     describe('WithdrawMoney', () => {
-//         describe('Withdraw money validation error', () => {
-//             describe('Withdraw money with improper fields', () => {
-//                 const payload = {
-//                     amount: 0
-//                 }
+describe('WITHDRAW MONEY', () => {
+    let token;
 
-//                 it('Status', done => {
-//                     request.post('http://localhost:2011/withdraw', {
-//                         json: payload
-//                     }, (_, response) => {
-//                         expect(response.statusCode).to.equal(400)
-//                         done()
-//                     })
-//                 })
+    it('Logs in a user Successfully', async () => {
+        const response = await request(appServer).post('/login').send({
+            email: "johndoeee@yopmail.com",
+            password: "johndoee"
+        })
+        expect(201)
+        token = response._body.message
+    })
 
-//                 it('Message', done => {
-//                     request.post('http://localhost:2011/withdraw', {
-//                         json: payload
-//                     }, (_, response) => {
-//                         expect(response.body.errors.firstName[0]).to.equal(`Please enter a valid amount to be withdrawn`)
-//                         done()
-//                     })
-//                 })
-//             })
-//         })
+    it('Returns a 400 response as there is no authorization token that was passed', async () => {
+        await request(appServer).post('/withdraw').send({
+            amount: 20
+        })
+        .expect(400)
+    })
 
-//         it('Withdraws Money Successfully', done => {
-//             request.post('http://localhost:2011/withdraw', {
-//                 json: {
-//                     amount: 1000
-//                 }
-//             }, (_, response) => {
-//                 expect(response.statusCode).to.equal(201)
-//                 done()
-//             })
-//         })
-//     })
-// })
+    it('Returns a 400 response as amount is set to 0', async () => {
+        await request(appServer).post('/withdraw').set('Authorization', `Bearer ${token}`).send({
+            amount: 0
+        })
+        .expect(400)
+    })
+
+    it('Withdraws Money Successfully', async () => {
+        const response = await request(appServer).post('/withdraw').set('Authorization', `Bearer ${token}`).send({
+            amount: 100
+        })
+        .expect(201)
+    })
+})
+

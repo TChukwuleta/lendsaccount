@@ -7,11 +7,17 @@ const transferSchema = Joi.object({
     receiver: Joi.number().required()
 })
 
+const amountSchema = Joi.object({
+    amount: Joi.number().integer().required()
+})
+
 const depositMoney = async (req, res) => {
     const user = req.user
     if(user){
         const findUser = await userService.findUser(user.email)
         if(findUser[0]){
+            const { error } = amountSchema.validate(req.body)
+            if(error) return res.status(400).send(error.details[0].message)
             const { amount } = req.body
             if(amount == 0) return res.status(400).json({ message: "Please enter a valid amount to be deposited" })
             const newBalance = findUser[0].account_balance + amount
@@ -52,6 +58,8 @@ const withdrawMoney = async (req, res) => {
     if(user){
         const findUser = await userService.findUser(user.email)
         if(findUser[0]){
+            const { error } = amountSchema.validate(req.body)
+            if(error) return res.status(400).send(error.details[0].message)
             const { amount } = req.body
             if(amount == 0) return res.status(400).json({ message: "Please enter a valid amount to be withdrawn" })
             if(findUser[0].account_balance < amount) return res.status(400).json({ message: "Insufficient balance" })

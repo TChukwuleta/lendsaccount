@@ -2,7 +2,7 @@ const db = require('../config/dbConfig')
 
 const createUser = async (firstName, lastName, email, password, accountNo, balance) => {
     console.log(accountNo)
-    const [ firstname ] = await db('user').insert({
+    const [ acctno ] = await db('user').insert({
         first_name: firstName,
         last_name: lastName,
         email,
@@ -10,8 +10,7 @@ const createUser = async (firstName, lastName, email, password, accountNo, balan
         account_no: accountNo,
         account_balance: balance
     }).returning("account_no")
-    console.log(firstName)
-    return firstname
+    return acctno
 }
 
 const checkUser = async (email) => {
