@@ -1,4 +1,11 @@
 const userService = require('../service/userService')
+const Joi = require('joi')
+
+// Registration validation schema
+const transferSchema = Joi.object({
+    amount: Joi.number().required(),
+    receiver: Joi.number().required()
+})
 
 const depositMoney = async (req, res) => {
     const user = req.user
@@ -6,6 +13,7 @@ const depositMoney = async (req, res) => {
         const findUser = await userService.findUser(user.email)
         if(findUser[0]){
             const { amount } = req.body
+            if(amount == 0) return res.status(400).json({ message: "Please enter a valid amount to be deposited" })
             const newBalance = findUser[0].account_balance + amount
             await userService.updateDetails(findUser[0].email, newBalance)
             return res.status(201).json({ message: `You have successfully deposited ${amount} to your account` })
@@ -19,7 +27,10 @@ const transferMoney = async (req, res) => {
     if(user){
         const findUser = await userService.findUser(user.email)
         if(findUser[0]){
+            const { error } = transferSchema.validate(req.body)
+            if(error) return res.status(400).send(error.details[0].message)
             const { amount, receiver } = req.body
+            if(amount == 0) return res.status(400).json({ message: "Please enter a valid amount to be transferred" })
             const findReceiver = await userService.findAccountNo(receiver)
             console.log(findReceiver)
             if(!findReceiver[0]) return res.status(400).json({ message: "Receiver account does not exist" })
@@ -42,6 +53,7 @@ const withdrawMoney = async (req, res) => {
         const findUser = await userService.findUser(user.email)
         if(findUser[0]){
             const { amount } = req.body
+            if(amount == 0) return res.status(400).json({ message: "Please enter a valid amount to be withdrawn" })
             if(findUser[0].account_balance < amount) return res.status(400).json({ message: "Insufficient balance" })
             const newBalance = findUser[0].account_balance - amount
             await userService.updateDetails(findUser[0].email, newBalance)
