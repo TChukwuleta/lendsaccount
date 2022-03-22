@@ -1,72 +1,39 @@
 const expect = require('chai').expect
-const request = require('request')
+const request = require('supertest')
+const appServer = require('../../app')
 
 
 describe('LOGIN USER API', () => {
     describe('LoginUser', () => {
         describe('Login user validation error', () => {
             describe('Login user missing field', () => {
-                const payload = {
-                    email: "",
-                    password: "johndoe"
-                }
-
-                it('Status', done => {
-                    request.post('http://localhost:2011/login', {
-                        json: payload
-                    }, (_, response) => {
-                        expect(response.statusCode).to.equal(400)
-                        done()
+                it('Returns a 400 response as email is empty', async () => {
+                    await request(appServer).post('/login').send({
+                        email: "",
+                        password: "johndoe"
                     })
-                })
-
-                it('Message', done => {
-                    request.post('http://localhost:2011/login', {
-                        json: payload
-                    }, (_, response) => {
-                        expect(response.body.errors.firstName[0]).to.equal(`"email" is not allowed to be empty`)
-                        done()
-                    })
+                    .expect(400)
                 })
             })
 
             describe("Login user invalid email field", () => {
-                const payload = {
-                    email: "johndoe",
-                    password: "johndoe"
-                }
-
-                it('Status', done => {
-                    request.post('http://localhost:2011/login', {
-                        json: payload
-                    }, (_, response) => {
-                        expect(response.statusCode).to.equal(400)
-                        done()
+                it('Returns a 400 response as email input is wrong', async () => {
+                    await request(appServer).post('/login').send({
+                        email: "johndoe",
+                        password: "johndoe"
                     })
-                })
-
-                it('Message', done => {
-                    request.post('http://localhost:2011/login', {
-                        json: payload
-                    }, (_, response) => {
-                        expect(response.body.errors.firstName[0]).to.equal(`"email" must be a valid email`)
-                        done()
-                    })
+                    .expect(400)
                 })
             })
 
         })
 
-        it('Logs in a user Successfully', done => {
-            request.post('http://localhost:2011/login', {
-                json: {
-                    email: "johndoeee@yopmail.com",
-                    password: "johndoee"
-                }
-            }, (_, response) => {
-                expect(response.statusCode).to.equal(201)
-                done()
+        it('Logs in a user Successfully', async () => {
+            await request(appServer).post('/login').send({
+                email: "johndoeee@yopmail.com",
+                password: "johndoee"
             })
+            expect(201)
         })
     })
 })
